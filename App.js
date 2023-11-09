@@ -1,114 +1,72 @@
 import logo from './logo.svg';
 import './App.css';
-import { createContext, useEffect, useState } from 'react';
-import Child from './Child';
 import Home from './Home';
 import Login from './Login';
-import axios from 'axios';
-
-export const DataContext = createContext({}); 
+import {useState, useEffect} from 'react';
 
 function App() {
-  const [name, setName] = useState("Vertin")
-  const [age, setAge] = useState("21")
-  const [message, setMessage] = useState("")
-  const [key,setKey] = useState("");
-  const [array,setArr] = useState([])
-  const [home, setHome] = useState(false)
-  const [product, setProduct] = useState([])
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [loginError, setLoginError] = useState(false);
+  const authorizedUser = [
+    {username: "CarlJohnson", password: "groovestreet"},
+    {username: "Vertin", password: "1999"},
+  ];
 
- // useEffect(() => {
- //   setName("Sonetto")
-  //   setAge(20)
-  // }, [])
-
-  const onChangeName = () => {
-    setName("Tristan")
+  const handleLogin = () => {
+    const user = authorizedUser.find(user => user.username === username && user.password === password);
+    if (user) {
+      setLoggedIn(true);
+    } else {
+      setLoginError(true);
+    }
   }
 
-  const onChangeAge = () => {
-    setAge(19)
-  }
 
-  const handleChange = (event) => {
-    setKey(event.target.value);
-  }
-
-  const addMessage = () => {
-    setArr([
-      ...array,
-      key
-    ])
-    setKey("")
-  }
-
-useEffect(() => {
-  axios.get('https://dummyjson.com/products?')
-  .then(res => {
-    setProducts(res.data.products);
-  })
-})
-
-  const contextData = {
-    name,
-    age
-  }
-  console.log(array);
   return (
-<DataContext.Provider value={contextData}>
-    <div className="App">
-      <ul>
-        {products.map(product =>
-          <li key={product.id} style={{textAlign: "left", paddingBottom: 20}}>
-            Name: {product.title} <br />
-            Description: {product.description} <br />
-            Price: {product.price} <br />
-          </li>
+    <>
+      {loggedIn ? (
+        <div className="container-sm">
+          <Home />
+          <Login />
+        </div>
+      ) : (
+        <div className="Container displayFlex">
+        <div className="login-container">
+          <h2 className="login-heading">Welcome to the React Shop 9000</h2>
+          <h3 className="login-subheading">Login</h3>
+          {loginError && (
+            <div className="error-message">*Invalid username/password. Please try again.</div>
           )}
-      </ul>
-    <h1>{name}</h1>
-    <h3>{age} years old</h3>
-    <button onClick={(onChangeName)}>
-      Change Player
-    </button>
-    <button onClick={(onChangeAge)}>
-      Change Age
-    </button>
-
-    <Child name={name} age={age} />
-    <br/>
-  
-    <textarea
-    rows={5}
-    cols={50}
-    onChange={handleChange} />
-    <p>Message: {key}</p>
-    <p>What's your name? {message}</p>
-    <button onClick={addMessage}>
-      Add new message
-    </button>
-    {array.map(text => <h3>{text}</h3>)}
-<div style={{padding: 20 }}></div>
-    {home ?
-      <Home />:
-      <Login />
-}
-{home ?
-    <button onClick={() => setHome(false)}>
-    Login!
-  </button>:
-      
-      <button onClick={() => setHome(true)}>
-      Logout!
-    </button>
-}
-
-    </div>
-
-
-
-    </DataContext.Provider>
+          <form className="login-form">
+            <div className={`form-group ${loginError ? 'error' : ''}`}>
+              <input
+                type="text"
+                placeholder="Username"
+                className="form-control"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div className={`form-group ${loginError ? 'error' : ''}`}>
+              <input
+                type="password"
+                placeholder="Password"
+                className="form-control"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <button type='button' className="login-button" onClick={handleLogin}>Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+  </>
   );
-}
+ }
 
 export default App;
